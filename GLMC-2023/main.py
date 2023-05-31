@@ -20,7 +20,7 @@ from sklearn.metrics import confusion_matrix
 from Trainer import Trainer
 
 best_acc1 = 0
-
+g = os.getcwd()
 
 def get_model(args):
     if args.dataset == "ImageNet-LT" or args.dataset == "iNaturelist2018":
@@ -62,13 +62,13 @@ def get_dataset(args):
         return trainset, testset
 
     if args.dataset == 'ImageNet-LT':
-        trainset = dataset_lt_data.LT_Dataset(args.root, '/data/data_txt/ImageNet_LT_train.txt', util.TwoCropTransform(transform_train))
-        testset = dataset_lt_data.LT_Dataset(args.root, '/data/data_txt/ImageNet_LT_test.txt', transform_val)
+        trainset = dataset_lt_data.LT_Dataset(args.root, 'data/data_txt/ImageNet_LT_train.txt', util.TwoCropTransform(transform_train))
+        testset = dataset_lt_data.LT_Dataset(args.root, 'data/data_txt/ImageNet_LT_test.txt', transform_val)
         return trainset, testset
 
     if args.dataset == 'iNaturelist2018':
-        trainset = dataset_lt_data.LT_Dataset(args.root, '/data/data_txt/iNaturalist18_train.txt', util.TwoCropTransform(transform_train))
-        testset = dataset_lt_data.LT_Dataset(args.root, '/data/data_txt/iNaturalist18_test.txt', transform_val)
+        trainset = dataset_lt_data.LT_Dataset(args.root, 'data/data_txt/iNaturalist18_train.txt', util.TwoCropTransform(transform_train))
+        testset = dataset_lt_data.LT_Dataset(args.root, 'data/data_txt/iNaturalist18_test.txt', transform_val)
         return trainset, testset
 
 
