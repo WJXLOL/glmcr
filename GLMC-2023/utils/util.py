@@ -2,6 +2,7 @@ import shutil
 from torch.utils import data
 import copy
 import os
+import torch
 from imbalance_data.cifar100Imbanlance import *
 from imbalance_data.cifar10Imbanlance import *
 from imbalance_data.dataset_lt_data import *
