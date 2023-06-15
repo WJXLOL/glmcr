@@ -206,5 +206,5 @@ def GLMC_mixed(org1, org2, invs1, invs2, label_org, label_invs, label_org_w, lab
 
 def print_model_param_nums(model=None):
     total = sum([param.nelement() for param in model.parameters()])
-    print('  + Number of params: %.2fM' % (total / 1e6))
+    print('  + Number of params- %.2fM' % (total / 1e6))
     return total

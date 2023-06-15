@@ -77,8 +77,8 @@ def main():
     print(args)
     curr_time = datetime.datetime.now()
     args.store_name = '#'.join(
-        ["dataset: " + args.dataset, "arch: " + args.arch, "imbanlance_rate: " + str(args.imbanlance_rate)
-            , datetime.datetime.strftime(curr_time, '%Y-%m-%d %H:%M:%S')])
+        ["dataset-" + args.dataset, "arch-" + args.arch, "imbanlance_rate-" + str(args.imbanlance_rate)
+            , datetime.datetime.strftime(curr_time, '%Y-%m-%d %H-%M-%S')])
     prepare_folders(args)
     if args.seed is not None:
         random.seed(args.seed)
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=str, default='cifar100', help="cifar10,cifar100,ImageNet-LT,iNaturelist2018")
     parser.add_argument('--root', type=str, default='data/', help="dataset setting")
     parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet34',
-                        choices=('resnet18', 'resnet34', 'resnet50', 'resnext50_32x4d'))
+                        choices=('resnet18','resnet32', 'resnet34', 'resnet50', 'resnext50_32x4d'))
     parser.add_argument('--num_classes', default=100, type=int, help='number of classes ')
     parser.add_argument('--imbanlance_rate', default=0.01, type=float, help='imbalance factor')
     parser.add_argument('--beta', type=float, default=0.5, help="augment mixture")
