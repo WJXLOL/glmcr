@@ -120,6 +120,15 @@ class Trainer(object):
 
                 loss = alpha * balance_loss + (1 - alpha) * rebalance_loss + self.contrast_weight * contrastive_loss
 
+                print("contrastive_loss")
+                print(contrastive_loss)
+                print("balance_loss")
+                print(balance_loss)
+                print("rebalance_loss")
+                print(rebalance_loss)
+                print("loss")
+                print(loss)
+
                 losses.update(loss.item(), inputs[0].size(0))
 
                 # compute gradient and do SGD step
