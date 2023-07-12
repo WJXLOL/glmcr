@@ -13,11 +13,13 @@ from utils.util import *
 import datetime
 import math
 from sklearn.metrics import confusion_matrix
-from loss import *
+# from loss import *
 import warnings
 
+
 class Trainer(object):
-    def __init__(self, args, model=None,train_loader=None, val_loader=None,weighted_train_loader=None,per_class_num=[],log=None):
+    def __init__(self, args, model=None, train_loader=None, val_loader=None, weighted_train_loader=None,
+                 per_class_num=[], log=None):
         self.args = args
         self.device = args.gpu
         self.print_freq = args.print_freq
@@ -34,7 +36,8 @@ class Trainer(object):
         self.cls_num_list = per_class_num
         self.contrast_weight = args.contrast_weight
         self.model = model
-        self.optimizer = torch.optim.SGD(self.model.parameters(), momentum=0.9, lr=self.lr,weight_decay=args.weight_decay)
+        self.optimizer = torch.optim.SGD(self.model.parameters(), momentum=0.9, lr=self.lr,
+                                         weight_decay=args.weight_decay)
         self.train_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=self.epochs)
         self.log = log
         self.beta = args.beta
@@ -61,6 +64,7 @@ class Trainer(object):
             weighted_train_loader = iter(self.weighted_train_loader)
 
             for i, (inputs, targets) in enumerate(self.train_loader):
+                u = inputs
 
                 input_org_1 = inputs[0]
                 input_org_2 = inputs[1]
@@ -77,7 +81,8 @@ class Trainer(object):
 
                 one_hot_org = torch.zeros(target_org.size(0), self.num_classes).scatter_(1, target_org.view(-1, 1), 1)
                 one_hot_org_w = self.per_cls_weights.cpu() * one_hot_org
-                one_hot_invs = torch.zeros(target_invs.size(0), self.num_classes).scatter_(1, target_invs.view(-1, 1), 1)
+                one_hot_invs = torch.zeros(target_invs.size(0), self.num_classes).scatter_(1, target_invs.view(-1, 1),
+                                                                                           1)
                 one_hot_invs = one_hot_invs[:one_hot_org.size()[0]]
                 one_hot_invs_w = self.per_cls_weights.cpu() * one_hot_invs
 
@@ -97,14 +102,14 @@ class Trainer(object):
                 # Data augmentation
                 lam = np.random.beta(self.beta, self.beta)
 
-                mix_x, cut_x, mixup_y, mixcut_y, mixup_y_w, cutmix_y_w = util.GLMC_mixed(org1=input_org_1, org2=input_org_2,
-                                                                                        invs1=input_invs_1,
-                                                                                        invs2=input_invs_2,
-                                                                                        label_org=one_hot_org,
-                                                                                        label_invs=one_hot_invs,
-                                                                                        label_org_w=one_hot_org_w,
-                                                                                        label_invs_w=one_hot_invs_w)
-
+                mix_x, cut_x, mixup_y, mixcut_y, mixup_y_w, cutmix_y_w = util.GLMC_mixed(org1=input_org_1,
+                                                                                         org2=input_org_2,
+                                                                                         invs1=input_invs_1,
+                                                                                         invs2=input_invs_2,
+                                                                                         label_org=one_hot_org,
+                                                                                         label_invs=one_hot_invs,
+                                                                                         label_org_w=one_hot_org_w,
+                                                                                         label_invs_w=one_hot_invs_w)
 
                 output_1, output_cb_1, z1, p1 = self.model(mix_x, train=True)
                 output_2, output_cb_2, z2, p2 = self.model(cut_x, train=True)
@@ -120,6 +125,7 @@ class Trainer(object):
 
                 loss = alpha * balance_loss + (1 - alpha) * rebalance_loss + self.contrast_weight * contrastive_loss
 
+                '''
                 print("contrastive_loss")
                 print(contrastive_loss)
                 print("balance_loss")
@@ -127,7 +133,8 @@ class Trainer(object):
                 print("rebalance_loss")
                 print(rebalance_loss)
                 print("loss")
-                print(loss)
+                print(loss)     
+                '''
 
                 losses.update(loss.item(), inputs[0].size(0))
 
@@ -145,7 +152,7 @@ class Trainer(object):
                               'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
                               'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
                         epoch + 1, self.epochs, i, len(self.train_loader), batch_time=batch_time,
-                    data_time=data_time, loss=losses))  # TODO
+                        data_time=data_time, loss=losses))  # TODO
                     print(output)
                     # evaluate on validation set
             acc1 = self.validate(epoch=epoch)
@@ -155,16 +162,16 @@ class Trainer(object):
                 self.train_scheduler.step()
             # remember best acc@1 and save checkpoint
             is_best = acc1 > best_acc1
-            best_acc1 = max(acc1,  best_acc1)
+            best_acc1 = max(acc1, best_acc1)
             output_best = 'Best Prec@1: %.3f\n' % (best_acc1)
             print(output_best)
             save_checkpoint(self.args, {
                 'epoch': epoch + 1,
                 'state_dict': self.model.state_dict(),
-                'best_acc1':  best_acc1,
+                'best_acc1': best_acc1,
             }, is_best, epoch + 1)
 
-    def validate(self,epoch=None):
+    def validate(self, epoch=None):
         batch_time = AverageMeter('Time', ':6.3f')
         top1 = AverageMeter('Acc@1', ':6.2f')
         top5 = AverageMeter('Acc@5', ':6.2f')
@@ -212,11 +219,15 @@ class Trainer(object):
             cls_cnt = cf.sum(axis=1)
             cls_hit = np.diag(cf)
             cls_acc = cls_hit / cls_cnt
-            output = ('EPOCH: {epoch} {flag} Results: Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(epoch=epoch + 1 , flag='val', top1=top1, top5=top5))
+            output = (
+                'EPOCH: {epoch} {flag} Results: Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(epoch=epoch + 1,
+                                                                                                    flag='val',
+                                                                                                    top1=top1,
+                                                                                                    top5=top5))
 
             self.log.info(output)
             out_cls_acc = '%s Class Accuracy: %s' % (
-            'val', (np.array2string(cls_acc, separator=',', formatter={'float_kind': lambda x: "%.3f" % x})))
+                'val', (np.array2string(cls_acc, separator=',', formatter={'float_kind': lambda x: "%.3f" % x})))
 
             many_shot = self.cls_num_list > 100
             medium_shot = (self.cls_num_list <= 100) & (self.cls_num_list > 20)
@@ -228,7 +239,7 @@ class Trainer(object):
                   )
         return top1.avg
 
-    def SimSiamLoss(self,p, z, version='simplified'):  # negative cosine similarity
+    def SimSiamLoss(self, p, z, version='simplified'):  # negative cosine similarity
         z = z.detach()  # stop gradient
 
         if version == 'original':
@@ -241,7 +252,7 @@ class Trainer(object):
         else:
             raise Exception
 
-    def paco_adjust_learning_rate(self,optimizer, epoch, args):
+    def paco_adjust_learning_rate(self, optimizer, epoch, args):
         warmup_epochs = 10
         lr = self.lr
         if epoch <= warmup_epochs:
@@ -250,6 +261,3 @@ class Trainer(object):
             lr *= 0.5 * (1. + math.cos(math.pi * (epoch - warmup_epochs + 1) / (self.epochs - warmup_epochs + 1)))
         for param_group in self.optimizer.param_groups:
             param_group['lr'] = lr
-
-
-

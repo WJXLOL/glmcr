@@ -198,7 +198,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--print_freq', default=1000, type=int, metavar='N',
                         help='print frequency (default: 100)')
     parser.add_argument('--gpu', default=0, type=int, help='GPU id to use.')
-    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+    parser.add_argument('-j', '--workers', default=2, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
     parser.add_argument('--resume', default=None, type=str, metavar='PATH',
                         help='path to latest checkpoint (default: none)')
